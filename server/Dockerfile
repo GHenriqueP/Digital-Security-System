@@ -1,31 +1,27 @@
-FROM node as builder
+FROM node:18
 
-# Create app directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Install app dependencies
+# COPY package.json and package-lock.json files
 COPY package*.json ./
 
-RUN npm ci
+# generated prisma files
+COPY prisma ./prisma/
 
+# COPY ENV variable
+COPY .env ./
+
+# COPY tsconfig.json file
+COPY tsconfig.json ./
+
+# COPY
 COPY . .
 
-RUN npm run build
+RUN npm install
 
-FROM node:slim
+RUN npx prisma generate
 
-ENV NODE_ENV production
-USER node
+EXPOSE 3000
 
-# Create app directory
-WORKDIR /usr/src/app
-
-# Install app dependencies
-COPY package*.json ./
-
-RUN npm ci --production
-
-COPY --from=builder /usr/src/app/dist ./dist
-
-EXPOSE 8080
-CMD [ "node", "dist/index.js" ]
+# A command to start the server
+CMD npm run dev
