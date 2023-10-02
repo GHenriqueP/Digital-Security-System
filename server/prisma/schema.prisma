@@ -24,6 +24,7 @@ model System {
   acronym     String
   email       String?
   url         String?
+  modJustify  String?
   isActive    Boolean  @default(true)
   upadted_at  DateTime @default(now())
 

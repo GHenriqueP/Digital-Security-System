@@ -1,25 +1,16 @@
-import { PrismaClient } from '@prisma/client';
-import express from 'express';
-
-const app = express();
-
-app.use(express.json());
+import express from 'express'
+import { router } from './routes'
+import { database } from './database';
 
 const PORT = 3000;
 
-const prisma = new PrismaClient({
-  log: ['query'],
-});
-
-app.get('/systems', async (request, response) => {
-  const systems = await prisma.system.findMany({})
-
-  return response.json(systems)
-})
+const app = express()
+app.use(express.json())
+app.use(router)
 
 async function main() {
-  await prisma.$connect();
-  app.listen(PORT, () => console.log('O servidor está ativo!'));
+  await database.$connect();
+  app.listen(PORT, () => console.log('The server is Running!'));
 }
 
 main();
