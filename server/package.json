@@ -12,8 +12,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/cors": "^2.8.14",
     "@types/express": "^4.17.18",
     "@types/node": "^20.7.2",
+    "@types/swagger-ui-express": "^4.1.4",
     "commitizen": "^4.3.0",
     "cz-conventional-changelog": "^3.3.0",
     "tsup": "^7.2.0",
@@ -22,8 +24,10 @@
   },
   "dependencies": {
     "@prisma/client": "^5.3.1",
+    "cors": "^2.8.5",
     "express": "^4.18.2",
     "mysql": "^2.18.1",
-    "prisma": "^5.3.1"
+    "prisma": "^5.3.1",
+    "swagger-ui-express": "^5.0.0"
   }
 }
