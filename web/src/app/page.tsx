@@ -14,15 +14,32 @@ export default function Home() {
   const { push } = useRouter();
 
   async function getData() {
-    const data = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/users`);
+    try {
+      const data = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/users/`);
 
-    if (!data.ok) {
-      console.error("Error");
+      if (!data.ok) {
+        console.error("Internal Server Error");
+        return;
+      }
+
+      const users = await data.json();
+
+      setUsers(users);
+    } catch (err) {
+      console.error(err);
     }
-
-    const users = await data.json();
-    setUsers(users);
   }
+
+  function handleSelectUser(event: React.ChangeEvent<HTMLSelectElement>) {
+    setSelected(event.target.value);
+  }
+
+  function handleRedirectSubmit() {
+    if (selected) {
+      push(`/${selected.replace(" ", "-")}`);
+    }
+  }
+
   useEffect(() => {
     getData();
   }, []);
@@ -34,7 +51,7 @@ export default function Home() {
       <select
         name="users"
         id="users"
-        onChange={(event) => setSelected(event.target.value)}
+        onChange={handleSelectUser}
         className="border-solid border-2 rounded-xl p-2 w-64 h-10"
       >
         <option value="">default</option>
@@ -47,12 +64,9 @@ export default function Home() {
 
       <button
         type="button"
-        onClick={() => {
-          if (selected) {
-            push(`/admin/?user=${selected}`);
-          }
-        }}
-        className="bg-slate-200 p-4 rounded-full mt-4 "
+        onClick={handleRedirectSubmit}
+        disabled={!selected}
+        className="bg-slate-200 p-4 rounded-full mt-4"
       >
         Manter Sistema
       </button>
