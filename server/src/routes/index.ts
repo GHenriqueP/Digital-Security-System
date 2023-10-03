@@ -11,7 +11,7 @@ const alterSystem = new AlterSystemController();
 
 router.get('/users', searchUsers.handle)
 router.get('/systems', searchSystems.handle)
-router.post('/systems', createSystem.handle)
+router.post('/system', createSystem.handle)
 router.put('/systems/:id', alterSystem.handle)
 
 export { router };

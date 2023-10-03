@@ -29,26 +29,45 @@
     }
   ],
   "paths": {
-    "/systems?acronym=*description=*email=*": {
+    "/systems": {
       "get": {
         "tags": ["Systems"],
-        "summary": "Returns all the systems",
-        "description": "Returns a map of status codes to quantities",
-        "operationId": "getInventory",
+        "summary": "Returns systems",
+        "description": "Returns all systems by default and specific systems when using filters by parameters.",
+        "parameters": [
+          {
+            "name": "description",
+            "in": "query",
+            "description": "String description of the system",
+            "required": false
+          },
+          {
+            "name": "acronym",
+            "in": "query",
+            "description": "String acronym of the system",
+            "required": false
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "description": "Email  of the system",
+            "required": false
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "integer",
-                    "format": "int32"
-                  }
+                  "$ref": "#components/schemas/System",
+                  "type": "object"
                 }
               }
             }
+          },
+          "500": {
+            "description": "Erro ao criar um novo sistema"
           }
         },
         "security": [
@@ -58,155 +77,132 @@
         ]
       }
     },
-    "/store/order": {
+    "/system": {
       "post": {
         "tags": ["Systems"],
-        "summary": "Place an order for a pet",
-        "description": "Place a new order in the store",
-        "operationId": "placeOrder",
+        "summary": "Create a new System",
+        "description": "Returns all systems by default and specific systems when using filters by parameters.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Order"
-              }
-            },
-            "application/xml": {
-              "schema": {
-                "$ref": "#/components/schemas/Order"
-              }
-            },
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "$ref": "#/components/schemas/Order"
+                "$ref": "#components/schemas/System",
+                "type": "object"
+              },
+              "examples": {
+                "System": {
+                  "value": {
+                    "description": "Salesforce",
+                    "acronym": "SFDC",
+                    "email": "example@email.com",
+                    "url": "",
+                    "userId": 1
+                  }
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Order"
-                }
-              }
-            }
+            "description": "Sistema alterado com sucesso" 
           },
-          "405": {
-            "description": "Invalid input"
+          "400": {
+            "description": "Descrição e sigla são obrigatórios" 
+          },
+          "401": {
+            "description": "Descrição deve ter no máximo 100 caracteres e sigla no máximo 10 caracteres" 
+          },
+          "402": {
+            "description": "E-mail de atendimento deve ter no máximo 100 caracteres" 
+          },
+          "403": {
+            "description": "URL deve ter no máximo 50 caracteres" 
+          },
+          "404": {
+            "description": "E-mail inválido" 
+          },
+          "500": {
+            "description": "Erro ao alterar o sistema"
           }
         }
       }
     },
-    "/store/order/{orderId}": {
-      "get": {
+    "/systems/{id}": {
+      "put": {
         "tags": ["Systems"],
-        "summary": "Find purchase order by ID",
-        "description": "For valid response try integer IDs with value <= 5 or > 5. Other values will generated exceptions",
-        "operationId": "getOrderById",
+        "summary": "Change an existing system",
         "parameters": [
           {
-            "name": "orderId",
+            "name": "id",
             "in": "path",
-            "description": "ID of pet that needs to be fetched",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
+            "description": "System ID that will be changed",
+            "required": true
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#components/schemas/System",
+                "type": "object"
+              },
+              "examples": {
+                "System": {
+                  "value": {
+                    "description": "Salesforce",
+                    "acronym": "SFDC",
+                    "email": "example@email.com",
+                    "url": "https://www.salesforce.com/br/",
+	                  "modJustify": "Estou alterando este sistema.",
+	                  "isActive": false,
+                    "userId": 1
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Order"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/Order"
-                }
-              }
-            }
+            "description": "successful operation" 
           },
           "400": {
-            "description": "Invalid ID supplied"
+            "description": "Descrição e sigla são obrigatórios" 
+          },
+          "401": {
+            "description": "Descrição deve ter no máximo 100 caracteres e sigla no máximo 10 caracteres" 
+          },
+          "402": {
+            "description": "E-mail de atendimento deve ter no máximo 100 caracteres" 
+          },
+          "403": {
+            "description": "URL deve ter no máximo 50 caracteres" 
           },
           "404": {
-            "description": "Order not found"
-          }
-        }
-      },
-      "delete": {
-        "tags": ["Systems"],
-        "summary": "Delete purchase order by ID",
-        "description": "For valid response try integer IDs with value < 1000. Anything above 1000 will generate API errors",
-        "operationId": "deleteOrder",
-        "parameters": [
-          {
-            "name": "orderId",
-            "in": "path",
-            "description": "ID of the order that needs to be deleted",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Invalid ID supplied"
+            "description": "E-mail inválido" 
           },
-          "404": {
-            "description": "Order not found"
+          "500": {
+            "description": "Erro ao buscar sistemas"
           }
         }
       }
     },
-    "/user/{username}": {
+    "/users": {
       "get": {
         "tags": ["User"],
-        "summary": "Get user by user name",
+        "summary": "Get Users",
         "description": "",
-        "operationId": "getUserByName",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "description": "The name that needs to be fetched. Use user name for testing.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
           "200": {
-            "description": "successful operation",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/User"
                 }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
               }
             }
-          },
-          "400": {
-            "description": "Invalid username supplied"
-          },
-          "404": {
-            "description": "User not found"
           }
         }
       }
@@ -214,7 +210,7 @@
   },
     "components": {
       "schemas": {
-        "Order": {
+        "System": {
           "type": "object",
           "properties": {
             "id": {
@@ -222,32 +218,43 @@
               "format": "int64",
               "example": 10
             },
-            "petId": {
-              "type": "integer",
-              "format": "int64",
-              "example": 198772
+            "Description": {
+              "type": "string",
+              "example": "System Something"
             },
-            "quantity": {
-              "type": "integer",
-              "format": "int32",
-              "example": 7
+            "Acronym": {
+              "type": "string",
+              "example": "SS"
             },
-            "shipDate": {
+            "email": {
+              "type": "string",
+              "example": "john@email.com"
+            },
+            "URL": {
+              "type": "string",
+              "example": "http://somethingurl.com/"
+            },
+            "modJustify": {
+              "type": "string",
+              "example": "I changed this system because are needed"
+            },
+            "isActive": {
+              "type": "string",
+              "example": "Ativo",
+              "enum": ["Ativo", "Inativo"]
+            },
+            "updated_at": {
               "type": "string",
               "format": "date-time"
             },
-            "status": {
-              "type": "string",
-              "description": "Order Status",
-              "example": "approved",
-              "enum": ["placed", "approved", "delivered"]
-            },
-            "complete": {
-              "type": "boolean"
+            "userId": {
+              "type": "integer",
+              "format": "int64",
+              "example": 198772
             }
           },
-          "xml": {
-            "name": "order"
+          "json": {
+            "name": "System"
           }
         }, 
         "User": {
@@ -261,86 +268,11 @@
             "username": {
               "type": "string",
               "example": "theUser"
-            },
-            "firstName": {
-              "type": "string",
-              "example": "John"
-            },
-            "lastName": {
-              "type": "string",
-              "example": "James"
-            },
-            "email": {
-              "type": "string",
-              "example": "john@email.com"
-            },
-            "password": {
-              "type": "string",
-              "example": "12345"
-            },
-            "phone": {
-              "type": "string",
-              "example": "12345"
-            },
-            "userStatus": {
-              "type": "integer",
-              "description": "User Status",
-              "format": "int32",
-              "example": 1
             }
           },
-          "xml": {
-            "name": "user"
+          "json": {
+            "name": "User"
           }
-        }
-      },
-      "requestBodies": {
-        "Pet": {
-          "description": "Pet object that needs to be added to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Pet"
-              }
-            },
-            "application/xml": {
-              "schema": {
-                "$ref": "#/components/schemas/Pet"
-              }
-            }
-          }
-        },
-        "UserArray": {
-          "description": "List of user object",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          }
-        }
-      },
-      "securitySchemes": {
-        "petstore_auth": {
-          "type": "oauth2",
-          "flows": {
-            "implicit": {
-              "authorizationUrl": "https://petstore3.swagger.io/oauth/authorize",
-              "scopes": {
-                "write:pets": "modify pets in your account",
-                "read:pets": "read your pets"
-              }
-            }
-          }
-        },
-        "api_key": {
-          "type": "apiKey",
-          "name": "api_key",
-          "in": "header"
         }
       }
     }
